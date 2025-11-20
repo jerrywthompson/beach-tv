@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beach TV with Sound & Menu</title>
+    <style>
+        body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#000; font-family:Arial, sans-serif; }
+        video { width:100vw; height:100vh; object-fit:cover; }
+        #menu {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 10;
+            transition: opacity 1s;
+        }
+        #menu h2 { margin:0 0 15px 0; font-size: 28px; }
+        .btn {
+            display: block;
+            width: 360px;
+            margin: 12px auto;
+            padding: 14px;
+            background: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #00aaff; }
+        #instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255,255,255,0.6);
+            font-size: 18px;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <video id="beachVideo" autoplay playsinline></video>
+
+    <div id="instructions">Press MENU or OK on your remote to choose a beach</div>
+
+    <div id="menu">
+        <h2>Choose Your Beach</h2>
+        <button class="btn" data-index="0">Tropical Paradise Waves</button>
+        <button class="btn" data-index="1">Golden Sunset Beach</button>
+        <button class="btn" data-index="2">Aerial Turquoise Ocean</button>
+        <button class="btn" data-index="3">Crystal Clear Rolling Waves</button>
+        <button class="btn" data-index="4">Malibu-style Sunny Beach</button>
+        <button class="btn" data-index="5">Hawaii North Shore</button>
+        <button class="btn" data-index="6">Caribbean Dream Beach</button>
+        <button class="btn" data-index="7">Fiji Lagoon (extra long)</button>
+    </div>
+
+    <script>
+        const videos = [
+            "https://videos.pexels.com/video-files/855564/855564-hd_1920_1080_30fps.mp4",        // Tropical waves
+            "https://videos.pexels.com/video-files/854752/854752-hd_1920_1080_30fps.mp4",        // Sunset
+            "https://videos.pexels.com/video-files/3250611/3250611-hd_1920_1080_30fps.mp4",      // Aerial paradise
+            "https://videos.pexels.com/video-files/855237/855237-hd_1920_1080_30fps.mp4",        // Turquoise waves
+            "https://videos.pexels.com/video-files/857195/857195-hd_1920_1080_30fps.mp4",        // Sunny beach
+            "https://videos.pexels.com/video-files/3047098/3047098-hd_1920_1080_30fps.mp4",      // Hawaii style
+            "https://videos.pexels.com/video-files/1720988/1720988-hd_1920_1080_30fps.mp4",      // Caribbean
+            "https://videos.pexels.com/video-files/7578615/7578615-hd_1920_1080_30fps.mp4"       // Fiji long loop
+        ];
+
+        const videoNames = [
+            "Tropical Paradise Waves",
+            "Golden Sunset Beach",
+            "Aerial Turquoise Ocean",
+            "Crystal Clear Rolling Waves",
+            "Malibu-style Sunny Beach",
+            "Hawaii North Shore",
+            "Caribbean Dream Beach",
+            "Fiji Lagoon (extra long)"
+        ];
+
+        const vid = document.getElementById("beachVideo");
+        const menu = document.getElementById("menu");
+        let hideTimer;
+
+        // Start with a random beach + sound
+        let current = Math.floor(Math.random() * videos.length);
+        vid.src = videos[current];
+        vid.play();
+
+        // Show menu when user presses any key or clicks/taps
+        function showMenu();
+        document.body.addEventListener('click', showMenu);
+        document.body.addEventListener('keydown', showMenu);
+        document.body.addEventListener('remote-press', showMenu); // some TVs
+
+        function showMenu() {
+            menu.style.opacity = '1';
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+                menu.style.opacity = '0';
+            }, 10000); // hides after 10 seconds of no activity
+        }
+
+        // Click a button → play that video with sound
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.onclick = () => {
+                current = btn.dataset.index;
+                vid.src = videos[current];
+                vid.play();
+                showMenu(); // keep menu open a bit longer
+            };
+        });
+
+        // Loop forever
+        vid.onended = () => {
+            current = (current + 1) % videos.length;
+            vid.src = videos[current];
+            vid.play();
+        };
+    </script>
+</body>
+</html>
